@@ -75,15 +75,11 @@
     let lastAnswerTime = 0;
     let showingAnswer = false;
     let currentQuestion = null;
-
-    function pickQuestion() {
-      const randomIndex = Math.floor(Math.random() * questions.length);
-      return questions[randomIndex];
-    }
+    let currentIndex = -1; // For sequential cycling
 
     function displayQuestion(data) {
       currentQuestion = data;
-      document.body.style.background = 'yellow';
+      document.body.style.background = '#FFD580'; // New background color
       document.getElementById('category').style.color = 'black';
       document.getElementById('question').style.color = 'black';
 
@@ -98,14 +94,17 @@
       document.getElementById('options').innerHTML = optionsHTML;
       document.getElementById('options').style.color = 'black';
       document.getElementById('showAnswerBtn').style.display = 'inline-block';
-
       showingAnswer = false;
+    }
+
+    function displayNextQuestion() {
+      currentIndex = (currentIndex + 1) % questions.length;
+      displayQuestion(questions[currentIndex]);
     }
 
     document.getElementById('showAnswerBtn').addEventListener('click', () => {
       const correctLetter = currentQuestion.answer;
       const options = Array.from(document.querySelectorAll('.option'));
-
       options.forEach(option => {
         const letter = option.getAttribute('data-letter');
         if (letter === correctLetter) {
@@ -114,7 +113,6 @@
           option.remove();
         }
       });
-
       lastAnswerTime = Date.now();
       showingAnswer = true;
     });
@@ -125,8 +123,7 @@
 
       if (show && !hasQuestion && (!showingAnswer || delayPassed)) {
         hasQuestion = true;
-        const q = pickQuestion();
-        displayQuestion(q);
+        displayNextQuestion(); // Sequential
       } else if (!show) {
         hasQuestion = false;
         document.body.style.background = 'black';
